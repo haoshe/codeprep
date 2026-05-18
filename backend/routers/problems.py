@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from database import get_db
 from models import Problem
 from pydantic import BaseModel
@@ -33,9 +34,13 @@ def create_problem(problem: ProblemCreate, db: Session = Depends(get_db)):
     if problem.difficulty:
         db_problem.next_review = calculate_next_review(problem.difficulty)
     db.add(db_problem)
-    db.commit()
-    db.refresh(db_problem)
-    return db_problem
+    try:
+        db.commit()
+        db.refresh(db_problem)
+        return db_problem
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Problem already exists")
 
 @router.put("/problems/{problem_id}/review")
 def update_review(problem_id: int, update: ProblemUpdate, db: Session = Depends(get_db)):

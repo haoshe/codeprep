@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getProblems, getDueProblems } from './api';
+import AddProblemForm from './AddProblemForm';
 
 function App() {
   const [problems, setProblems] = useState([]);
@@ -10,12 +11,18 @@ function App() {
     getDueProblems().then(setDueProblems);
   }, []);
 
+  const handleAdd = (newProblem) => {
+    setProblems([...problems, newProblem]);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-white shadow px-6 py-4">
         <h1 className="text-2xl font-bold text-blue-600">CodePrep</h1>
       </nav>
       <main className="max-w-4xl mx-auto p-6">
+
+        <AddProblemForm onAdd={handleAdd} problems={problems} />
 
         <h2 className="text-xl font-semibold mb-4">Today's Review Queue</h2>
         {dueProblems.length === 0 ? (

@@ -1,15 +1,16 @@
-from sqlalchemy import Column, Integer, String, Text, Date
+from sqlalchemy import Column, Integer, String, Text, Date, UniqueConstraint
 from database import Base
 from datetime import date
 
 class Problem(Base):
     __tablename__ = "problems"
+    __table_args__ = (UniqueConstraint('name', name='uq_problem_name'),)
 
     id              = Column(Integer, primary_key=True, index=True)
     name            = Column(String(255), nullable=False)
     pattern         = Column(String(100))
     difficulty      = Column(String(20))
-    source          = Column(String(20))   # "leetcode" or "oa"
+    source          = Column(String(20))
     problem_link    = Column(String(500), nullable=True)
     solution_link   = Column(String(500), nullable=True)
     solution        = Column(Text, nullable=True)
