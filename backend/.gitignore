@@ -1,2 +1,4 @@
 .env
 venv/
+import_*.csv
+import_*.py
