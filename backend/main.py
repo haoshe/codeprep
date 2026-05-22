@@ -1,10 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from database import engine, Base
-import models
 from routers import problems
-
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
