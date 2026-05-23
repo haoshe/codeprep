@@ -35,6 +35,15 @@ export const deleteProblem = async (id) => {
   return res.json();
 };
 
+export const editProblem = async (id, data) => {
+  const res = await fetch(`${BASE_URL}/problems/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+};
+
 export const searchProblems = async (q) => {
   const res = await fetch(`${BASE_URL}/problems/search?q=${q}`);
   return res.json();
