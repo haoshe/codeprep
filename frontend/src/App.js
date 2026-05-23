@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { getProblems, getDueProblems, deleteProblem, updateReview, editProblem } from './api';
 import AddProblemForm from './AddProblemForm';
 
-const toLeetCodeUrl = (name) =>
-  `https://leetcode.com/problems/${name.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-')}/`;
+const toLeetCodeUrl = (name) => {
+  const slug = name.replace(/^\d+\.\s*/, '').toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-');
+  return `https://leetcode.com/problems/${slug}/`;
+};
 
 const DIFFICULTY_COLORS = {
   Hard: 'border-red-400 text-red-600 hover:bg-red-50',
