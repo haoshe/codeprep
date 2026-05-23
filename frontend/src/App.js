@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getProblems, getDueProblems, deleteProblem, updateReview, editProblem } from './api';
-import AddProblemForm, { PatternSelector, DifficultySelector } from './AddProblemForm';
+import AddProblemForm, { PatternSelector, DifficultySelector, PATTERNS } from './AddProblemForm';
 
 const toLeetCodeUrl = (name) => {
   const slug = name.replace(/^\d+\.\s*/, '').toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-');
@@ -45,12 +45,14 @@ function App() {
 
   const handleEdit = (p) => {
     setEditingId(p.id);
-    setEditForm({ name: p.name, pattern: p.pattern || '', difficulty: p.difficulty || 'Easy', problem_link: p.problem_link || '', solution_link: p.solution_link || '' });
+    const cleanPattern = (p.pattern || '').split(', ').filter(pat => PATTERNS.includes(pat)).join(', ');
+    setEditForm({ name: p.name, pattern: cleanPattern, difficulty: p.difficulty || 'Easy', problem_link: p.problem_link || '', solution_link: p.solution_link || '' });
   };
 
   const handleEditSave = async (id) => {
     const updated = await editProblem(id, editForm);
     setProblems(problems.map(p => p.id === id ? updated : p));
+    setDueProblems(dueProblems.map(p => p.id === id ? updated : p));
     setEditingId(null);
   };
 
@@ -146,7 +148,7 @@ function App() {
                         <div className="flex gap-2">
                           <button onClick={() => handleEditSave(p.id)} className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Save</button>
                           <button onClick={() => setEditingId(null)} className="text-gray-500 px-3 py-1 rounded text-sm hover:bg-gray-100">Cancel</button>
-                          <button onClick={() => { handleDelete(p.id); setEditingId(null); }} className="ml-auto text-red-500 hover:text-red-700 text-sm">Delete</button>
+                          <button onClick={() => { if (window.confirm('Delete this problem?')) { handleDelete(p.id); setEditingId(null); } }} className="ml-auto text-red-500 hover:text-red-700 text-sm">Delete</button>
                         </div>
                       </div>
                     ) : (
