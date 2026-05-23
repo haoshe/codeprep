@@ -116,6 +116,32 @@ function App() {
                 ))}
               </ul>
             )}
+
+            <h2 className="text-xl font-semibold mt-8 mb-4">Upcoming Reviews</h2>
+            {(() => {
+              const days = Array.from({ length: 14 }, (_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() + i);
+                const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                const count = problems.filter(p => p.next_review === dateStr).length;
+                const label = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                return { dateStr, count, label };
+              });
+              const maxCount = Math.max(...days.map(d => d.count), 1);
+              return (
+                <div className="bg-white rounded shadow p-4 space-y-2">
+                  {days.map(({ dateStr, count, label }) => (
+                    <div key={dateStr} className="flex items-center gap-3">
+                      <div className="w-28 text-sm text-gray-500 text-right shrink-0">{label}</div>
+                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                        {count > 0 && <div className="h-4 rounded-full bg-blue-400" style={{ width: `${(count / maxCount) * 100}%` }} />}
+                      </div>
+                      <div className="w-6 text-sm text-gray-600 shrink-0">{count > 0 ? count : ''}</div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </>
         )}
 
