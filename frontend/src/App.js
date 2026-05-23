@@ -141,14 +141,14 @@ function App() {
                   <li key={p.id} className="bg-white p-4 rounded shadow">
                     {editingId === p.id ? (
                       <div className="space-y-2">
-                        <input className="w-full border p-2 rounded text-sm" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} placeholder="Problem name" />
+                        <input className="w-full border p-2 rounded text-sm" value={editForm.name} onChange={e => setEditForm(f => ({...f, name: e.target.value}))} placeholder="Problem name" />
                         <PatternSelector
                           selected={editForm.pattern ? editForm.pattern.split(', ').filter(Boolean) : []}
-                          onChange={(patterns) => setEditForm({...editForm, pattern: patterns.join(', ')})}
+                          onChange={(patterns) => setEditForm(f => ({...f, pattern: patterns.join(', ')}))}
                         />
-                        <DifficultySelector value={editForm.difficulty} onChange={(difficulty) => setEditForm({...editForm, difficulty})} />
-                        {tab === 'oa' && <input className="w-full border p-2 rounded text-sm" value={editForm.problem_link} onChange={e => setEditForm({...editForm, problem_link: e.target.value})} placeholder="Problem link" />}
-                        {tab === 'oa' && <input className="w-full border p-2 rounded text-sm" value={editForm.solution_link} onChange={e => setEditForm({...editForm, solution_link: e.target.value})} placeholder="Solution link" />}
+                        <DifficultySelector value={editForm.difficulty} onChange={(difficulty) => setEditForm(f => ({...f, difficulty}))} />
+                        {tab === 'oa' && <input className="w-full border p-2 rounded text-sm" value={editForm.problem_link} onChange={e => setEditForm(f => ({...f, problem_link: e.target.value}))} placeholder="Problem link" />}
+                        {tab === 'oa' && <input className="w-full border p-2 rounded text-sm" value={editForm.solution_link} onChange={e => setEditForm(f => ({...f, solution_link: e.target.value}))} placeholder="Solution link" />}
                         <div className="flex gap-2">
                           <button onClick={() => handleEditSave(p.id)} className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Save</button>
                           <button onClick={() => setEditingId(null)} className="text-gray-500 px-3 py-1 rounded text-sm hover:bg-gray-100">Cancel</button>

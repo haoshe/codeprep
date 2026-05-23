@@ -94,14 +94,14 @@ function AddProblemForm({ onAdd, problems = [], source }) {
     <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow mb-8 space-y-4">
       <h2 className="text-xl font-semibold">Add {source === 'oa' ? 'OA' : 'LeetCode'} Problem</h2>
       {error && <p className="text-red-500 text-sm">{error}</p>}
-      <input className="w-full border p-2 rounded" placeholder="Problem name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
+      <input className="w-full border p-2 rounded" placeholder="Problem name" value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} required />
       <PatternSelector
         selected={form.selectedPatterns}
-        onChange={(selectedPatterns) => setForm({...form, selectedPatterns})}
+        onChange={(selectedPatterns) => setForm(f => ({...f, selectedPatterns}))}
       />
-      <DifficultySelector value={form.difficulty} onChange={(difficulty) => setForm({...form, difficulty})} />
-      {source === 'oa' && <input className="w-full border p-2 rounded" placeholder="Problem link" value={form.problem_link} onChange={e => setForm({...form, problem_link: e.target.value})} />}
-      {source === 'oa' && <input className="w-full border p-2 rounded" placeholder="Solution link" value={form.solution_link} onChange={e => setForm({...form, solution_link: e.target.value})} />}
+      <DifficultySelector value={form.difficulty} onChange={(difficulty) => setForm(f => ({...f, difficulty}))} />
+      {source === 'oa' && <input className="w-full border p-2 rounded" placeholder="Problem link" value={form.problem_link} onChange={e => setForm(f => ({...f, problem_link: e.target.value}))} />}
+      {source === 'oa' && <input className="w-full border p-2 rounded" placeholder="Solution link" value={form.solution_link} onChange={e => setForm(f => ({...f, solution_link: e.target.value}))} />}
       <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Problem</button>
     </form>
   );
