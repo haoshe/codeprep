@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getProblems, getDueProblems, deleteProblem, updateReview, editProblem } from './api';
-import AddProblemForm from './AddProblemForm';
+import AddProblemForm, { PatternSelector, DifficultySelector } from './AddProblemForm';
 
 const toLeetCodeUrl = (name) => {
   const slug = name.replace(/^\d+\.\s*/, '').toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-');
@@ -136,10 +136,11 @@ function App() {
                     {editingId === p.id ? (
                       <div className="space-y-2">
                         <input className="w-full border p-2 rounded text-sm" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} placeholder="Problem name" />
-                        <input className="w-full border p-2 rounded text-sm" value={editForm.pattern} onChange={e => setEditForm({...editForm, pattern: e.target.value})} placeholder="Pattern" />
-                        <select className="w-full border p-2 rounded text-sm" value={editForm.difficulty} onChange={e => setEditForm({...editForm, difficulty: e.target.value})}>
-                          <option>Hard</option><option>Medium</option><option>Easy</option><option>Mastered</option>
-                        </select>
+                        <PatternSelector
+                          selected={editForm.pattern ? editForm.pattern.split(', ').filter(Boolean) : []}
+                          onChange={(patterns) => setEditForm({...editForm, pattern: patterns.join(', ')})}
+                        />
+                        <DifficultySelector value={editForm.difficulty} onChange={(difficulty) => setEditForm({...editForm, difficulty})} />
                         {tab === 'oa' && <input className="w-full border p-2 rounded text-sm" value={editForm.problem_link} onChange={e => setEditForm({...editForm, problem_link: e.target.value})} placeholder="Problem link" />}
                         {tab === 'oa' && <input className="w-full border p-2 rounded text-sm" value={editForm.solution_link} onChange={e => setEditForm({...editForm, solution_link: e.target.value})} placeholder="Solution link" />}
                         <div className="flex gap-2">

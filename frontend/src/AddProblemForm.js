@@ -1,10 +1,63 @@
 import React, { useState } from 'react';
 import { createProblem } from './api';
 
+export const PATTERNS = [
+  'Array', 'Hash Map', 'Two Pointers', 'Sliding Window', 'Binary Search',
+  'Stack', 'Queue', 'Linked List', 'Tree', 'Graph', 'DFS', 'BFS',
+  'Dynamic Programming', 'Greedy', 'Backtracking', 'Heap', 'Trie',
+  'Sorting', 'Math', 'String', 'Bit Manipulation', 'Union Find', 'Monotonic Stack',
+];
+
+const DIFFICULTY_STYLES = {
+  Hard: { active: 'bg-red-500 text-white border-red-500', inactive: 'text-red-500 border-red-300 hover:border-red-500' },
+  Medium: { active: 'bg-yellow-500 text-white border-yellow-500', inactive: 'text-yellow-500 border-yellow-300 hover:border-yellow-500' },
+  Easy: { active: 'bg-green-500 text-white border-green-500', inactive: 'text-green-500 border-green-300 hover:border-green-500' },
+  Mastered: { active: 'bg-blue-500 text-white border-blue-500', inactive: 'text-blue-500 border-blue-300 hover:border-blue-500' },
+};
+
+export function DifficultySelector({ value, onChange }) {
+  return (
+    <div>
+      <p className="text-sm text-gray-500 mb-2">Difficulty</p>
+      <div className="flex gap-2">
+        {Object.keys(DIFFICULTY_STYLES).map(d => (
+          <button
+            key={d}
+            type="button"
+            onClick={() => onChange(d)}
+            className={`text-sm px-4 py-1 rounded-full border ${value === d ? DIFFICULTY_STYLES[d].active : DIFFICULTY_STYLES[d].inactive}`}
+          >{d}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function PatternSelector({ selected, onChange }) {
+  const toggle = (p) => {
+    onChange(selected.includes(p) ? selected.filter(x => x !== p) : [...selected, p]);
+  };
+  return (
+    <div>
+      <p className="text-sm text-gray-500 mb-2">Patterns</p>
+      <div className="flex flex-wrap gap-2">
+        {PATTERNS.map(p => (
+          <button
+            key={p}
+            type="button"
+            onClick={() => toggle(p)}
+            className={`text-sm px-3 py-1 rounded-full border ${selected.includes(p) ? 'bg-blue-600 text-white border-blue-600' : 'text-gray-600 border-gray-300 hover:border-blue-400'}`}
+          >{p}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function AddProblemForm({ onAdd, problems = [], source }) {
   const [form, setForm] = useState({
     name: '',
-    pattern: '',
+    selectedPatterns: [],
     difficulty: 'Easy',
     problem_link: '',
     solution_link: '',
@@ -20,13 +73,20 @@ function AddProblemForm({ onAdd, problems = [], source }) {
       setError('Problem already exists');
       return;
     }
-    const result = await createProblem({ ...form, name: trimmedName, source });
+    const result = await createProblem({
+      name: trimmedName,
+      pattern: form.selectedPatterns.join(', '),
+      difficulty: form.difficulty,
+      problem_link: form.problem_link,
+      solution_link: form.solution_link,
+      source,
+    });
     if (result.detail) {
       setError(result.detail);
       return;
     }
     onAdd(result);
-    setForm({ name: '', pattern: '', difficulty: 'Easy', problem_link: '', solution_link: '' });
+    setForm({ name: '', selectedPatterns: [], difficulty: 'Easy', problem_link: '', solution_link: '' });
   };
 
   return (
@@ -34,13 +94,11 @@ function AddProblemForm({ onAdd, problems = [], source }) {
       <h2 className="text-xl font-semibold">Add {source === 'oa' ? 'OA' : 'LeetCode'} Problem</h2>
       {error && <p className="text-red-500 text-sm">{error}</p>}
       <input className="w-full border p-2 rounded" placeholder="Problem name" value={form.name} onChange={e => setForm({...form, name: e.target.value})} required />
-      <input className="w-full border p-2 rounded" placeholder="Pattern (e.g. Hash Map)" value={form.pattern} onChange={e => setForm({...form, pattern: e.target.value})} />
-      <select className="w-full border p-2 rounded" value={form.difficulty} onChange={e => setForm({...form, difficulty: e.target.value})}>
-        <option>Hard</option>
-        <option>Medium</option>
-        <option>Easy</option>
-        <option>Mastered</option>
-      </select>
+      <PatternSelector
+        selected={form.selectedPatterns}
+        onChange={(selectedPatterns) => setForm({...form, selectedPatterns})}
+      />
+      <DifficultySelector value={form.difficulty} onChange={(difficulty) => setForm({...form, difficulty})} />
       {source === 'oa' && <input className="w-full border p-2 rounded" placeholder="Problem link" value={form.problem_link} onChange={e => setForm({...form, problem_link: e.target.value})} />}
       {source === 'oa' && <input className="w-full border p-2 rounded" placeholder="Solution link" value={form.solution_link} onChange={e => setForm({...form, solution_link: e.target.value})} />}
       <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Problem</button>
