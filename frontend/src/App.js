@@ -26,7 +26,7 @@ const DIFFICULTY_BADGE = {
 function App() {
   const [problems, setProblems] = useState([]);
   const [dueProblems, setDueProblems] = useState([]);
-  const [view, setView] = useState('review');
+  const [view, setView] = useState('problems');
   const [tab, setTab] = useState('leetcode');
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
