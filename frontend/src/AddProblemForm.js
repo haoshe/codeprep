@@ -41,7 +41,7 @@ function AddProblemForm({ onAdd, problems = [], source }) {
         <option>Easy</option>
         <option>Mastered</option>
       </select>
-      <input className="w-full border p-2 rounded" placeholder="Problem link" value={form.problem_link} onChange={e => setForm({...form, problem_link: e.target.value})} />
+      {source === 'oa' && <input className="w-full border p-2 rounded" placeholder="Problem link" value={form.problem_link} onChange={e => setForm({...form, problem_link: e.target.value})} />}
       {source === 'oa' && <input className="w-full border p-2 rounded" placeholder="Solution link" value={form.solution_link} onChange={e => setForm({...form, solution_link: e.target.value})} />}
       <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Problem</button>
     </form>
