@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { getProblems, getDueProblems, deleteProblem, updateReview, editProblem } from './api';
 import AddProblemForm from './AddProblemForm';
 
+const toLeetCodeUrl = (name) =>
+  `https://leetcode.com/problems/${name.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-')}/`;
+
 const DIFFICULTY_COLORS = {
   Hard: 'border-red-400 text-red-600 hover:bg-red-50',
   Medium: 'border-yellow-400 text-yellow-600 hover:bg-yellow-50',
@@ -83,7 +86,13 @@ function App() {
                 {dueProblems.map(p => (
                   <li key={p.id} className="bg-white p-4 rounded shadow flex justify-between items-center">
                     <div>
-                      <div>{p.name}</div>
+                      {p.source === 'oa' ? (
+                        p.problem_link
+                          ? <a href={p.problem_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{p.name}</a>
+                          : <div>{p.name}</div>
+                      ) : (
+                        <a href={toLeetCodeUrl(p.name)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{p.name}</a>
+                      )}
                       {p.pattern && <div className="text-xs text-gray-400 mt-0.5">{p.pattern}</div>}
                     </div>
                     <div className="flex gap-2">
@@ -140,7 +149,13 @@ function App() {
                     ) : (
                       <div className="flex justify-between items-center">
                         <div>
-                          <div>{p.name}</div>
+                          {p.source === 'oa' ? (
+                            p.problem_link
+                              ? <a href={p.problem_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{p.name}</a>
+                              : <div>{p.name}</div>
+                          ) : (
+                            <a href={toLeetCodeUrl(p.name)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{p.name}</a>
+                          )}
                           {p.pattern && <div className="text-xs text-gray-400 mt-0.5">{p.pattern}</div>}
                         </div>
                         <div className="flex items-center gap-4">
