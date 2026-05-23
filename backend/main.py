@@ -17,3 +17,7 @@ app.include_router(problems.router)
 @app.get("/")
 def root():
     return {"message": "CodePrep API is running"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
