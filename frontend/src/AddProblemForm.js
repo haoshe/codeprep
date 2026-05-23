@@ -6,6 +6,7 @@ export const PATTERNS = [
   'Stack', 'Queue', 'Linked List', 'Tree', 'Graph', 'DFS', 'BFS',
   'Dynamic Programming', 'Greedy', 'Backtracking', 'Heap', 'Trie',
   'Sorting', 'Math', 'String', 'Bit Manipulation', 'Union Find', 'Monotonic Stack',
+  'KMP', 'Bellman-Ford', 'Boyer-Moore', 'Morris Traversal',
 ];
 
 const DIFFICULTY_STYLES = {

@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 INTERVALS = {
+    "Brand New": 1,
     "Hard": 2,
     "Medium": 5,
     "Easy": 7,

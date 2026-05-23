@@ -8,6 +8,7 @@ const toLeetCodeUrl = (name) => {
 };
 
 const DIFFICULTY_COLORS = {
+  'Brand New': 'border-purple-400 text-purple-600 hover:bg-purple-50',
   Hard: 'border-red-400 text-red-600 hover:bg-red-50',
   Medium: 'border-yellow-400 text-yellow-600 hover:bg-yellow-50',
   Easy: 'border-green-400 text-green-600 hover:bg-green-50',
@@ -28,6 +29,8 @@ function App() {
   const [tab, setTab] = useState('leetcode');
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 20;
 
   useEffect(() => {
     getProblems().then(setProblems);
@@ -100,7 +103,7 @@ function App() {
                       {p.pattern && <div className="text-xs text-gray-400 mt-0.5">{p.pattern}</div>}
                     </div>
                     <div className="flex gap-2">
-                      {['Hard', 'Medium', 'Easy', 'Mastered'].map(d => (
+                      {['Brand New', 'Hard', 'Medium', 'Easy', 'Mastered'].map(d => (
                         <button
                           key={d}
                           onClick={() => handleReview(p.id, d)}
@@ -121,19 +124,20 @@ function App() {
 
             <div className="flex gap-2 mb-4">
               <button
-                onClick={() => setTab('leetcode')}
+                onClick={() => { setTab('leetcode'); setPage(1); }}
                 className={`px-4 py-2 rounded font-medium ${tab === 'leetcode' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
               >LeetCode <span className={`ml-1 text-xs px-2 py-0.5 rounded-full ${tab === 'leetcode' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}>{problems.filter(p => p.source === 'leetcode').length}</span></button>
               <button
-                onClick={() => setTab('oa')}
+                onClick={() => { setTab('oa'); setPage(1); }}
                 className={`px-4 py-2 rounded font-medium ${tab === 'oa' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
               >OA <span className={`ml-1 text-xs px-2 py-0.5 rounded-full ${tab === 'oa' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}>{problems.filter(p => p.source === 'oa').length}</span></button>
             </div>
             {problems.filter(p => p.source === tab).length === 0 ? (
               <p className="text-gray-500">No problems yet.</p>
             ) : (
+              <>
               <ul className="space-y-2">
-                {problems.filter(p => p.source === tab).map(p => (
+                {problems.filter(p => p.source === tab).slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map(p => (
                   <li key={p.id} className="bg-white p-4 rounded shadow">
                     {editingId === p.id ? (
                       <div className="space-y-2">
@@ -173,6 +177,19 @@ function App() {
                   </li>
                 ))}
               </ul>
+              {(() => {
+                const total = problems.filter(p => p.source === tab).length;
+                const totalPages = Math.ceil(total / PAGE_SIZE);
+                if (totalPages <= 1) return null;
+                return (
+                  <div className="flex items-center justify-between mt-4">
+                    <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 rounded border text-sm disabled:opacity-40 hover:bg-gray-100">Previous</button>
+                    <span className="text-sm text-gray-500">Page {page} of {totalPages}</span>
+                    <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 rounded border text-sm disabled:opacity-40 hover:bg-gray-100">Next</button>
+                  </div>
+                );
+              })()}
+              </>
             )}
           </>
         )}
