@@ -16,6 +16,7 @@ const DIFFICULTY_COLORS = {
 };
 
 const DIFFICULTY_BADGE = {
+  'Brand New': 'bg-purple-100 text-purple-600',
   Hard: 'bg-red-100 text-red-600',
   Medium: 'bg-yellow-100 text-yellow-600',
   Easy: 'bg-green-100 text-green-600',

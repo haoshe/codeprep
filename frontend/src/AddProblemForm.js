@@ -10,6 +10,7 @@ export const PATTERNS = [
 ];
 
 const DIFFICULTY_STYLES = {
+  'Brand New': { active: 'bg-purple-500 text-white border-purple-500', inactive: 'text-purple-500 border-purple-300 hover:border-purple-500' },
   Hard: { active: 'bg-red-500 text-white border-red-500', inactive: 'text-red-500 border-red-300 hover:border-red-500' },
   Medium: { active: 'bg-yellow-500 text-white border-yellow-500', inactive: 'text-yellow-500 border-yellow-300 hover:border-yellow-500' },
   Easy: { active: 'bg-green-500 text-white border-green-500', inactive: 'text-green-500 border-green-300 hover:border-green-500' },
