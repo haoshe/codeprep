@@ -140,7 +140,7 @@ function App() {
                         <select className="w-full border p-2 rounded text-sm" value={editForm.difficulty} onChange={e => setEditForm({...editForm, difficulty: e.target.value})}>
                           <option>Hard</option><option>Medium</option><option>Easy</option><option>Mastered</option>
                         </select>
-                        <input className="w-full border p-2 rounded text-sm" value={editForm.problem_link} onChange={e => setEditForm({...editForm, problem_link: e.target.value})} placeholder="Problem link" />
+                        {tab === 'oa' && <input className="w-full border p-2 rounded text-sm" value={editForm.problem_link} onChange={e => setEditForm({...editForm, problem_link: e.target.value})} placeholder="Problem link" />}
                         {tab === 'oa' && <input className="w-full border p-2 rounded text-sm" value={editForm.solution_link} onChange={e => setEditForm({...editForm, solution_link: e.target.value})} placeholder="Solution link" />}
                         <div className="flex gap-2">
                           <button onClick={() => handleEditSave(p.id)} className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Save</button>
