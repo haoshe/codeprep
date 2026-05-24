@@ -5,8 +5,9 @@ export const getProblems = async () => {
   return res.json();
 };
 
-export const getDueProblems = async () => {
-  const res = await fetch(`${BASE_URL}/problems/due`);
+export const getDueProblems = async (limit = null) => {
+  const url = limit ? `${BASE_URL}/problems/due?limit=${limit}` : `${BASE_URL}/problems/due`;
+  const res = await fetch(url);
   return res.json();
 };
 

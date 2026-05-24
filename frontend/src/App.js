@@ -32,11 +32,12 @@ function App() {
   const [editForm, setEditForm] = useState({});
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 20;
+  const [cap, setCap] = useState(null);
 
   useEffect(() => {
     getProblems().then(setProblems);
-    getDueProblems().then(setDueProblems);
-  }, []);
+    getDueProblems(cap).then(setDueProblems);
+  }, [cap]);
 
   const handleAdd = (newProblem) => {
     setProblems([...problems, newProblem]);
@@ -86,7 +87,19 @@ function App() {
 
         {view === 'review' && (
           <>
-            <h2 className="text-xl font-semibold mb-4">Today's Review Queue</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Today's Review Queue</h2>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500">Cap:</span>
+                {[10, 20, null].map(n => (
+                  <button
+                    key={n ?? 'all'}
+                    onClick={() => setCap(n)}
+                    className={`text-sm px-3 py-1 rounded border ${cap === n ? 'bg-blue-600 text-white border-blue-600' : 'text-gray-600 border-gray-300 hover:border-blue-400'}`}
+                  >{n ?? 'All'}</button>
+                ))}
+              </div>
+            </div>
             {dueProblems.length === 0 ? (
               <p className="text-gray-500">No problems due today.</p>
             ) : (

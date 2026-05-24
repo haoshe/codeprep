@@ -95,8 +95,17 @@ def search_problems(q: str, db: Session = Depends(get_db)):
         Problem.pattern.ilike(f"%{q}%")
     ).all()
 
+PRIORITY = {'Brand New': 0, 'Hard': 1}
+
 @router.get("/problems/due")
-def get_due_problems(db: Session = Depends(get_db)):
+def get_due_problems(limit: Optional[int] = None, db: Session = Depends(get_db)):
     today = date.today()
-    return db.query(Problem).filter(Problem.next_review <= today).all()
+    problems = db.query(Problem).filter(Problem.next_review <= today).all()
+    problems.sort(key=lambda p: (
+        PRIORITY.get(p.difficulty, 2),
+        p.next_review or today
+    ))
+    if limit:
+        problems = problems[:limit]
+    return problems
 
