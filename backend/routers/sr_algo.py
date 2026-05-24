@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 import math
+import random
 
 RESET_INTERVALS = {
     'Brand New': 1,
@@ -26,6 +27,9 @@ def calculate_next_review(difficulty: str, last_interval: int = 1) -> tuple:
     else:
         multiplier = MULTIPLIERS.get(difficulty, 1.0)
         new_interval = max(1, math.ceil(last_interval * multiplier))
+        if new_interval > 2:
+            fuzz = random.uniform(-0.1, 0.1)
+            new_interval = max(1, round(new_interval * (1 + fuzz)))
     return date.today() + timedelta(days=new_interval), new_interval
 
 def initial_interval(difficulty: str) -> int:
