@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from datetime import date
 from typing import Optional
 from routers.sr_algo import calculate_next_review, initial_interval
+from auth import get_current_user
 
 router = APIRouter()
 
@@ -32,12 +33,12 @@ class ProblemEdit(BaseModel):
     solution_link: Optional[str] = None
 
 @router.get("/problems")
-def get_problems(db: Session = Depends(get_db)):
-    return db.query(Problem).all()
+def get_problems(db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
+    return db.query(Problem).filter(Problem.user_id == user_id).all()
 
 @router.post("/problems")
-def create_problem(problem: ProblemCreate, db: Session = Depends(get_db)):
-    db_problem = Problem(**problem.dict())
+def create_problem(problem: ProblemCreate, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
+    db_problem = Problem(**problem.dict(), user_id=user_id)
     if problem.difficulty:
         interval = initial_interval(problem.difficulty)
         db_problem.last_interval = interval
@@ -52,8 +53,8 @@ def create_problem(problem: ProblemCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Problem already exists")
 
 @router.put("/problems/{problem_id}/review")
-def update_review(problem_id: int, update: ProblemUpdate, db: Session = Depends(get_db)):
-    problem = db.query(Problem).filter(Problem.id == problem_id).first()
+def update_review(problem_id: int, update: ProblemUpdate, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
+    problem = db.query(Problem).filter(Problem.id == problem_id, Problem.user_id == user_id).first()
     if not problem:
         raise HTTPException(status_code=404, detail="Problem not found")
     problem.difficulty = update.difficulty
@@ -63,8 +64,8 @@ def update_review(problem_id: int, update: ProblemUpdate, db: Session = Depends(
     return problem
 
 @router.put("/problems/{problem_id}")
-def edit_problem(problem_id: int, update: ProblemEdit, db: Session = Depends(get_db)):
-    problem = db.query(Problem).filter(Problem.id == problem_id).first()
+def edit_problem(problem_id: int, update: ProblemEdit, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
+    problem = db.query(Problem).filter(Problem.id == problem_id, Problem.user_id == user_id).first()
     if not problem:
         raise HTTPException(status_code=404, detail="Problem not found")
     for field, value in update.dict(exclude_unset=True).items():
@@ -78,8 +79,8 @@ def edit_problem(problem_id: int, update: ProblemEdit, db: Session = Depends(get
         raise HTTPException(status_code=400, detail="Problem already exists")
 
 @router.delete("/problems/{problem_id}")
-def delete_problem(problem_id: int, db: Session = Depends(get_db)):
-    problem = db.query(Problem).filter(Problem.id == problem_id).first()
+def delete_problem(problem_id: int, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
+    problem = db.query(Problem).filter(Problem.id == problem_id, Problem.user_id == user_id).first()
     if not problem:
         raise HTTPException(status_code=404, detail="Problem not found")
     db.delete(problem)
@@ -87,8 +88,10 @@ def delete_problem(problem_id: int, db: Session = Depends(get_db)):
     return {"message": "Problem deleted"}
 
 @router.get("/problems/search")
-def search_problems(q: str, db: Session = Depends(get_db)):
+def search_problems(q: str, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
     return db.query(Problem).filter(
+        Problem.user_id == user_id,
+    ).filter(
         Problem.name.ilike(f"%{q}%") |
         Problem.solution.ilike(f"%{q}%") |
         Problem.explanation.ilike(f"%{q}%") |
@@ -98,9 +101,9 @@ def search_problems(q: str, db: Session = Depends(get_db)):
 PRIORITY = {'Brand New': 0, 'Hard': 1}
 
 @router.get("/problems/due")
-def get_due_problems(limit: Optional[int] = None, db: Session = Depends(get_db)):
+def get_due_problems(limit: Optional[int] = None, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
     today = date.today()
-    problems = db.query(Problem).filter(Problem.next_review <= today).all()
+    problems = db.query(Problem).filter(Problem.user_id == user_id, Problem.next_review <= today).all()
     problems.sort(key=lambda p: (
         PRIORITY.get(p.difficulty, 2),
         p.next_review or today
@@ -108,4 +111,3 @@ def get_due_problems(limit: Optional[int] = None, db: Session = Depends(get_db))
     if limit:
         problems = problems[:limit]
     return problems
-

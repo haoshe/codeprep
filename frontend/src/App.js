@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { getProblems, getDueProblems, deleteProblem, updateReview, editProblem } from './api';
 import AddProblemForm, { PatternSelector, DifficultySelector, PATTERNS } from './AddProblemForm';
+import supabase from './supabaseClient';
+import AuthPage from './AuthPage';
+
+const getDisplayName = (session) => {
+  const meta = session?.user?.user_metadata;
+  return meta?.username || meta?.user_name || meta?.full_name || meta?.name || session?.user?.email?.split('@')[0] || 'User';
+};
 
 const toLeetCodeUrl = (name) => {
   const slug = name.replace(/^\d+\.\s*/, '').toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-');
@@ -24,6 +31,7 @@ const DIFFICULTY_BADGE = {
 };
 
 function App() {
+  const [session, setSession] = useState(undefined);
   const [problems, setProblems] = useState([]);
   const [dueProblems, setDueProblems] = useState([]);
   const [view, setView] = useState('problems');
@@ -35,9 +43,16 @@ function App() {
   const [cap, setCap] = useState(null);
 
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setSession(session));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!session) return;
     getProblems().then(setProblems);
     getDueProblems(cap).then(setDueProblems);
-  }, [cap]);
+  }, [cap, session]);
 
   const handleAdd = (newProblem) => {
     setProblems([...problems, newProblem]);
@@ -67,19 +82,31 @@ function App() {
     setProblems(problems.map(p => p.id === id ? updated : p));
   };
 
+  if (session === undefined) return null;
+  if (!session) return <AuthPage />;
+
   return (
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-white shadow px-6 py-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-blue-600">CodePrep</h1>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-6">
+          <h1 className="text-2xl font-bold text-blue-600">CodePrep</h1>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setView('review')}
+              className={`px-4 py-2 rounded font-medium ${view === 'review' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+            >Review {dueProblems.length > 0 && <span className="ml-1 bg-red-500 text-white text-xs rounded-full px-2">{dueProblems.length}</span>}</button>
+            <button
+              onClick={() => setView('problems')}
+              className={`px-4 py-2 rounded font-medium ${view === 'problems' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+            >My Problems</button>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-500">Hi, {getDisplayName(session)}</span>
           <button
-            onClick={() => setView('review')}
-            className={`px-4 py-2 rounded font-medium ${view === 'review' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-          >Review {dueProblems.length > 0 && <span className="ml-1 bg-red-500 text-white text-xs rounded-full px-2">{dueProblems.length}</span>}</button>
-          <button
-            onClick={() => setView('problems')}
-            className={`px-4 py-2 rounded font-medium ${view === 'problems' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-          >My Problems</button>
+            onClick={() => supabase.auth.signOut()}
+            className="px-3 py-2 rounded text-sm text-gray-500 hover:bg-gray-100"
+          >Log out</button>
         </div>
       </nav>
 
