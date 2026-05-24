@@ -6,7 +6,7 @@ from models import Problem
 from pydantic import BaseModel
 from datetime import date
 from typing import Optional
-from routers.sr_algo import calculate_next_review
+from routers.sr_algo import calculate_next_review, initial_interval
 
 router = APIRouter()
 
@@ -39,7 +39,9 @@ def get_problems(db: Session = Depends(get_db)):
 def create_problem(problem: ProblemCreate, db: Session = Depends(get_db)):
     db_problem = Problem(**problem.dict())
     if problem.difficulty:
-        db_problem.next_review = calculate_next_review(problem.difficulty)
+        interval = initial_interval(problem.difficulty)
+        db_problem.last_interval = interval
+        db_problem.next_review, _ = calculate_next_review(problem.difficulty, interval)
     db.add(db_problem)
     try:
         db.commit()
@@ -55,7 +57,7 @@ def update_review(problem_id: int, update: ProblemUpdate, db: Session = Depends(
     if not problem:
         raise HTTPException(status_code=404, detail="Problem not found")
     problem.difficulty = update.difficulty
-    problem.next_review = calculate_next_review(update.difficulty)
+    problem.next_review, problem.last_interval = calculate_next_review(update.difficulty, problem.last_interval or 1)
     db.commit()
     db.refresh(problem)
     return problem
@@ -67,8 +69,6 @@ def edit_problem(problem_id: int, update: ProblemEdit, db: Session = Depends(get
         raise HTTPException(status_code=404, detail="Problem not found")
     for field, value in update.dict(exclude_unset=True).items():
         setattr(problem, field, value)
-    if update.difficulty:
-        problem.next_review = calculate_next_review(update.difficulty)
     try:
         db.commit()
         db.refresh(problem)

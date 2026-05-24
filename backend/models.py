@@ -17,3 +17,4 @@ class Problem(Base):
     explanation     = Column(Text, nullable=True)
     date_solved     = Column(Date, default=date.today)
     next_review     = Column(Date, nullable=True)
+    last_interval   = Column(Integer, default=1)
