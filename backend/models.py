@@ -4,9 +4,10 @@ from datetime import date
 
 class Problem(Base):
     __tablename__ = "problems"
-    __table_args__ = (UniqueConstraint('name', name='uq_problem_name'),)
+    __table_args__ = (UniqueConstraint('name', 'user_id', name='uq_problem_name_user'),)
 
     id              = Column(Integer, primary_key=True, index=True)
+    user_id         = Column(String(36), nullable=True, index=True)
     name            = Column(String(255), nullable=False)
     pattern         = Column(String(100))
     difficulty      = Column(String(20))

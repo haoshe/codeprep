@@ -1,20 +1,30 @@
+import supabase from './supabaseClient';
+
 const BASE_URL = process.env.REACT_APP_API_URL || 'http://127.0.0.1:8000';
 
+const authHeaders = async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${session?.access_token}`,
+  };
+};
+
 export const getProblems = async () => {
-  const res = await fetch(`${BASE_URL}/problems`);
+  const res = await fetch(`${BASE_URL}/problems`, { headers: await authHeaders() });
   return res.json();
 };
 
 export const getDueProblems = async (limit = null) => {
   const url = limit ? `${BASE_URL}/problems/due?limit=${limit}` : `${BASE_URL}/problems/due`;
-  const res = await fetch(url);
+  const res = await fetch(url, { headers: await authHeaders() });
   return res.json();
 };
 
 export const createProblem = async (problem) => {
   const res = await fetch(`${BASE_URL}/problems`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: await authHeaders(),
     body: JSON.stringify(problem),
   });
   return res.json();
@@ -23,7 +33,7 @@ export const createProblem = async (problem) => {
 export const updateReview = async (id, difficulty) => {
   const res = await fetch(`${BASE_URL}/problems/${id}/review`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: await authHeaders(),
     body: JSON.stringify({ difficulty }),
   });
   return res.json();
@@ -32,6 +42,7 @@ export const updateReview = async (id, difficulty) => {
 export const deleteProblem = async (id) => {
   const res = await fetch(`${BASE_URL}/problems/${id}`, {
     method: 'DELETE',
+    headers: await authHeaders(),
   });
   return res.json();
 };
@@ -39,13 +50,13 @@ export const deleteProblem = async (id) => {
 export const editProblem = async (id, data) => {
   const res = await fetch(`${BASE_URL}/problems/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: await authHeaders(),
     body: JSON.stringify(data),
   });
   return res.json();
 };
 
 export const searchProblems = async (q) => {
-  const res = await fetch(`${BASE_URL}/problems/search?q=${q}`);
+  const res = await fetch(`${BASE_URL}/problems/search?q=${q}`, { headers: await authHeaders() });
   return res.json();
 };
