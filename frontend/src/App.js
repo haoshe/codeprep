@@ -19,7 +19,7 @@ const DIFFICULTY_COLORS = {
   Hard: 'border-red-400 text-red-600 hover:bg-red-50',
   Medium: 'border-yellow-400 text-yellow-600 hover:bg-yellow-50',
   Easy: 'border-green-400 text-green-600 hover:bg-green-50',
-  Mastered: 'border-blue-400 text-blue-600 hover:bg-blue-50',
+  Mastered: 'border-indigo-400 text-indigo-500 hover:bg-indigo-50',
 };
 
 const DIFFICULTY_BADGE = {
@@ -27,7 +27,7 @@ const DIFFICULTY_BADGE = {
   Hard: 'bg-red-100 text-red-600',
   Medium: 'bg-yellow-100 text-yellow-600',
   Easy: 'bg-green-100 text-green-600',
-  Mastered: 'bg-blue-100 text-blue-600',
+  Mastered: 'bg-indigo-100 text-indigo-500',
 };
 
 function App() {
@@ -89,15 +89,15 @@ function App() {
     <div className="min-h-screen bg-gray-100">
       <nav className="bg-white shadow px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <h1 className="text-2xl font-bold text-blue-600">CodePrep</h1>
+          <h1 className="text-2xl font-bold text-indigo-500">CodePrep</h1>
           <div className="flex gap-2">
             <button
               onClick={() => setView('review')}
-              className={`px-4 py-2 rounded font-medium ${view === 'review' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+              className={`px-4 py-2 rounded font-medium ${view === 'review' ? 'bg-indigo-500 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
             >Review {dueProblems.length > 0 && <span className="ml-1 bg-red-500 text-white text-xs rounded-full px-2">{dueProblems.length}</span>}</button>
             <button
               onClick={() => setView('problems')}
-              className={`px-4 py-2 rounded font-medium ${view === 'problems' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+              className={`px-4 py-2 rounded font-medium ${view === 'problems' ? 'bg-indigo-500 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
             >My Problems</button>
           </div>
         </div>
@@ -122,7 +122,7 @@ function App() {
                   <button
                     key={n ?? 'all'}
                     onClick={() => setCap(n)}
-                    className={`text-sm px-3 py-1 rounded border ${cap === n ? 'bg-blue-600 text-white border-blue-600' : 'text-gray-600 border-gray-300 hover:border-blue-400'}`}
+                    className={`text-sm px-3 py-1 rounded border ${cap === n ? 'bg-indigo-500 text-white border-indigo-500' : 'text-gray-600 border-gray-300 hover:border-indigo-400'}`}
                   >{n ?? 'All'}</button>
                 ))}
               </div>
@@ -136,10 +136,10 @@ function App() {
                     <div>
                       {p.source === 'oa' ? (
                         p.problem_link
-                          ? <a href={p.problem_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{p.name}</a>
+                          ? <a href={p.problem_link} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{p.name}</a>
                           : <div>{p.name}</div>
                       ) : (
-                        <a href={toLeetCodeUrl(p.name)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{p.name}</a>
+                        <a href={toLeetCodeUrl(p.name)} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{p.name}</a>
                       )}
                       {p.pattern && <div className="text-xs text-gray-400 mt-0.5">{p.pattern}</div>}
                     </div>
@@ -174,7 +174,7 @@ function App() {
                     <div key={dateStr} className="flex items-center gap-3">
                       <div className="w-28 text-sm text-gray-500 text-right shrink-0">{label}</div>
                       <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                        {count > 0 && <div className="h-4 rounded-full bg-blue-400" style={{ width: `${(count / maxCount) * 100}%` }} />}
+                        {count > 0 && <div className="h-4 rounded-full bg-indigo-400" style={{ width: `${(count / maxCount) * 100}%` }} />}
                       </div>
                       <div className="w-6 text-sm text-gray-600 shrink-0">{count > 0 ? count : ''}</div>
                     </div>
@@ -192,12 +192,12 @@ function App() {
             <div className="flex gap-2 mb-4">
               <button
                 onClick={() => { setTab('leetcode'); setPage(1); }}
-                className={`px-4 py-2 rounded font-medium ${tab === 'leetcode' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-              >LeetCode <span className={`ml-1 text-xs px-2 py-0.5 rounded-full ${tab === 'leetcode' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}>{problems.filter(p => p.source === 'leetcode').length}</span></button>
+                className={`px-4 py-2 rounded font-medium ${tab === 'leetcode' ? 'bg-indigo-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+              >LeetCode <span className={`ml-1 text-xs px-2 py-0.5 rounded-full ${tab === 'leetcode' ? 'bg-indigo-400 text-white' : 'bg-gray-200 text-gray-600'}`}>{problems.filter(p => p.source === 'leetcode').length}</span></button>
               <button
                 onClick={() => { setTab('oa'); setPage(1); }}
-                className={`px-4 py-2 rounded font-medium ${tab === 'oa' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-              >OA <span className={`ml-1 text-xs px-2 py-0.5 rounded-full ${tab === 'oa' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'}`}>{problems.filter(p => p.source === 'oa').length}</span></button>
+                className={`px-4 py-2 rounded font-medium ${tab === 'oa' ? 'bg-indigo-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+              >OA <span className={`ml-1 text-xs px-2 py-0.5 rounded-full ${tab === 'oa' ? 'bg-indigo-400 text-white' : 'bg-gray-200 text-gray-600'}`}>{problems.filter(p => p.source === 'oa').length}</span></button>
             </div>
             {problems.filter(p => p.source === tab).length === 0 ? (
               <p className="text-gray-500">No problems yet.</p>
@@ -217,7 +217,7 @@ function App() {
                         {tab === 'oa' && <input className="w-full border p-2 rounded text-sm" value={editForm.problem_link} onChange={e => setEditForm(f => ({...f, problem_link: e.target.value}))} placeholder="Problem link" />}
                         {tab === 'oa' && <input className="w-full border p-2 rounded text-sm" value={editForm.solution_link} onChange={e => setEditForm(f => ({...f, solution_link: e.target.value}))} placeholder="Solution link" />}
                         <div className="flex gap-2">
-                          <button onClick={() => handleEditSave(p.id)} className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Save</button>
+                          <button onClick={() => handleEditSave(p.id)} className="bg-indigo-500 text-white px-3 py-1 rounded text-sm hover:bg-indigo-600">Save</button>
                           <button onClick={() => setEditingId(null)} className="text-gray-500 px-3 py-1 rounded text-sm hover:bg-gray-100">Cancel</button>
                           <button onClick={() => { if (window.confirm('Delete this problem?')) { handleDelete(p.id); setEditingId(null); } }} className="ml-auto text-red-500 hover:text-red-700 text-sm">Delete</button>
                         </div>
@@ -227,17 +227,17 @@ function App() {
                         <div>
                           {p.source === 'oa' ? (
                             p.problem_link
-                              ? <a href={p.problem_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{p.name}</a>
+                              ? <a href={p.problem_link} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{p.name}</a>
                               : <div>{p.name}</div>
                           ) : (
-                            <a href={toLeetCodeUrl(p.name)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{p.name}</a>
+                            <a href={toLeetCodeUrl(p.name)} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{p.name}</a>
                           )}
                           {p.pattern && <div className="text-xs text-gray-400 mt-0.5">{p.pattern}</div>}
                         </div>
                         <div className="flex items-center gap-4">
                           {p.difficulty && <span className={`text-xs px-2 py-1 rounded-full font-medium ${DIFFICULTY_BADGE[p.difficulty]}`}>{p.difficulty}</span>}
                           <span className="text-sm text-gray-400">Next review: {p.next_review}</span>
-                          <button onClick={() => handleEdit(p)} className="text-blue-500 hover:text-blue-700 text-sm">Edit</button>
+                          <button onClick={() => handleEdit(p)} className="text-indigo-500 hover:text-indigo-600 text-sm">Edit</button>
                         </div>
                       </div>
                     )}

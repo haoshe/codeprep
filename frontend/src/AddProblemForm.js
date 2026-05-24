@@ -14,7 +14,7 @@ const DIFFICULTY_STYLES = {
   Hard: { active: 'bg-red-500 text-white border-red-500', inactive: 'text-red-500 border-red-300 hover:border-red-500' },
   Medium: { active: 'bg-yellow-500 text-white border-yellow-500', inactive: 'text-yellow-500 border-yellow-300 hover:border-yellow-500' },
   Easy: { active: 'bg-green-500 text-white border-green-500', inactive: 'text-green-500 border-green-300 hover:border-green-500' },
-  Mastered: { active: 'bg-blue-500 text-white border-blue-500', inactive: 'text-blue-500 border-blue-300 hover:border-blue-500' },
+  Mastered: { active: 'bg-indigo-500 text-white border-indigo-500', inactive: 'text-indigo-500 border-indigo-300 hover:border-indigo-500' },
 };
 
 export function DifficultySelector({ value, onChange }) {
@@ -48,7 +48,7 @@ export function PatternSelector({ selected, onChange }) {
             key={p}
             type="button"
             onClick={() => toggle(p)}
-            className={`text-sm px-3 py-1 rounded-full border ${selected.includes(p) ? 'bg-blue-600 text-white border-blue-600' : 'text-gray-600 border-gray-300 hover:border-blue-400'}`}
+            className={`text-sm px-3 py-1 rounded-full border ${selected.includes(p) ? 'bg-indigo-500 text-white border-indigo-500' : 'text-gray-600 border-gray-300 hover:border-indigo-400'}`}
           >{p}</button>
         ))}
       </div>
@@ -103,7 +103,7 @@ function AddProblemForm({ onAdd, problems = [], source }) {
       <DifficultySelector value={form.difficulty} onChange={(difficulty) => setForm(f => ({...f, difficulty}))} />
       {source === 'oa' && <input className="w-full border p-2 rounded" placeholder="Problem link" value={form.problem_link} onChange={e => setForm(f => ({...f, problem_link: e.target.value}))} />}
       {source === 'oa' && <input className="w-full border p-2 rounded" placeholder="Solution link" value={form.solution_link} onChange={e => setForm(f => ({...f, solution_link: e.target.value}))} />}
-      <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Problem</button>
+      <button type="submit" className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">Add Problem</button>
     </form>
   );
 }
