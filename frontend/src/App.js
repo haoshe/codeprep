@@ -10,7 +10,7 @@ const getDisplayName = (session) => {
 };
 
 const toLeetCodeUrl = (name) => {
-  const slug = name.replace(/^\d+\.\s*/, '').toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-');
+  const slug = name.replace(/^\d+\.\s*/, '').toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
   return `https://leetcode.com/problems/${slug}/`;
 };
 
