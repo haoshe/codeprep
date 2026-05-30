@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import problems
+from routers import problems, behavioral
 
 app = FastAPI()
 
@@ -13,6 +13,7 @@ app.add_middleware(
 )
 
 app.include_router(problems.router)
+app.include_router(behavioral.router)
 
 @app.get("/")
 def root():

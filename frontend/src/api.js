@@ -60,3 +60,34 @@ export const searchProblems = async (q) => {
   const res = await fetch(`${BASE_URL}/problems/search?q=${q}`, { headers: await authHeaders() });
   return res.json();
 };
+
+export const getBehavioral = async () => {
+  const res = await fetch(`${BASE_URL}/behavioral`, { headers: await authHeaders() });
+  return res.json();
+};
+
+export const createBehavioral = async (data) => {
+  const res = await fetch(`${BASE_URL}/behavioral`, {
+    method: 'POST',
+    headers: await authHeaders(),
+    body: JSON.stringify(data),
+  });
+  return res.json();
+};
+
+export const updateBehavioral = async (id, answer) => {
+  const res = await fetch(`${BASE_URL}/behavioral/${id}`, {
+    method: 'PUT',
+    headers: await authHeaders(),
+    body: JSON.stringify({ answer }),
+  });
+  return res.json();
+};
+
+export const deleteBehavioral = async (id) => {
+  const res = await fetch(`${BASE_URL}/behavioral/${id}`, {
+    method: 'DELETE',
+    headers: await authHeaders(),
+  });
+  return res.json();
+};

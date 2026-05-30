@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, Date, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Text, Date, Boolean, UniqueConstraint
 from database import Base
 from datetime import date
 
@@ -19,3 +19,13 @@ class Problem(Base):
     date_solved     = Column(Date, default=date.today)
     next_review     = Column(Date, nullable=True)
     last_interval   = Column(Integer, default=1)
+
+class BehavioralEntry(Base):
+    __tablename__ = "behavioral_entries"
+    __table_args__ = (UniqueConstraint('user_id', 'question', name='uq_behavioral_user_question'),)
+
+    id         = Column(Integer, primary_key=True, index=True)
+    user_id    = Column(String(36), nullable=False, index=True)
+    question   = Column(Text, nullable=False)
+    answer     = Column(Text, nullable=True)
+    is_custom  = Column(Boolean, default=False)
