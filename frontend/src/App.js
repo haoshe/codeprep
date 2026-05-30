@@ -41,6 +41,7 @@ function App() {
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 20;
   const [cap, setCap] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
@@ -223,22 +224,37 @@ function App() {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex justify-between items-center">
-                        <div>
-                          {p.source === 'oa' ? (
-                            p.problem_link
-                              ? <a href={p.problem_link} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{p.name}</a>
-                              : <div>{p.name}</div>
-                          ) : (
-                            <a href={toLeetCodeUrl(p.name)} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{p.name}</a>
-                          )}
-                          {p.pattern && <div className="text-xs text-gray-400 mt-0.5">{p.pattern}</div>}
+                      <div>
+                        <div className="flex justify-between items-center">
+                          <div>
+                            {p.source === 'oa' ? (
+                              p.problem_link
+                                ? <a href={p.problem_link} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{p.name}</a>
+                                : <div>{p.name}</div>
+                            ) : (
+                              <a href={toLeetCodeUrl(p.name)} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline">{p.name}</a>
+                            )}
+                            {p.pattern && <div className="text-xs text-gray-400 mt-0.5">{p.pattern}</div>}
+                          </div>
+                          <div className="flex items-center gap-4">
+                            {p.difficulty && <span className={`text-xs px-2 py-1 rounded-full font-medium ${DIFFICULTY_BADGE[p.difficulty]}`}>{p.difficulty}</span>}
+                            <span className="text-sm text-gray-400">Next review: {p.next_review}</span>
+                            {p.source === 'oa' && (p.solution || p.solution_link) && (
+                              p.solution
+                                ? <button onClick={() => setExpandedId(expandedId === p.id ? null : p.id)} className="text-sm text-gray-500 hover:text-indigo-500">
+                                    {expandedId === p.id ? 'Hide Solution' : 'Solution'}
+                                  </button>
+                                : <a href={p.solution_link} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 hover:text-indigo-500">Solution</a>
+                            )}
+                            <button onClick={() => handleEdit(p)} className="text-indigo-500 hover:text-indigo-600 text-sm">Edit</button>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                          {p.difficulty && <span className={`text-xs px-2 py-1 rounded-full font-medium ${DIFFICULTY_BADGE[p.difficulty]}`}>{p.difficulty}</span>}
-                          <span className="text-sm text-gray-400">Next review: {p.next_review}</span>
-                          <button onClick={() => handleEdit(p)} className="text-indigo-500 hover:text-indigo-600 text-sm">Edit</button>
-                        </div>
+                        {p.source === 'oa' && expandedId === p.id && p.solution && (
+                          <div className="mt-3 pt-3 border-t border-gray-100">
+                            <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono bg-gray-50 rounded p-3">{p.solution}</pre>
+                            {p.explanation && <p className="text-sm text-gray-500 mt-2">{p.explanation}</p>}
+                          </div>
+                        )}
                       </div>
                     )}
                   </li>
