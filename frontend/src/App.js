@@ -3,6 +3,7 @@ import { getProblems, getDueProblems, deleteProblem, updateReview, editProblem }
 import AddProblemForm, { PatternSelector, DifficultySelector, PATTERNS } from './AddProblemForm';
 import supabase from './supabaseClient';
 import AuthPage from './AuthPage';
+import BehavioralPage from './BehavioralPage';
 
 const getDisplayName = (session) => {
   const meta = session?.user?.user_metadata;
@@ -100,6 +101,10 @@ function App() {
               onClick={() => setView('problems')}
               className={`px-4 py-2 rounded font-medium ${view === 'problems' ? 'bg-indigo-500 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
             >My Problems</button>
+            <button
+              onClick={() => setView('behavioral')}
+              className={`px-4 py-2 rounded font-medium ${view === 'behavioral' ? 'bg-indigo-500 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+            >Behavioural</button>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -185,6 +190,8 @@ function App() {
             })()}
           </>
         )}
+
+        {view === 'behavioral' && <BehavioralPage />}
 
         {view === 'problems' && (
           <>
