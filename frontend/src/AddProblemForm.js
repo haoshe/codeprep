@@ -5,7 +5,7 @@ export const PATTERNS = [
   'Array', 'Hash Map', 'Two Pointers', 'Sliding Window', 'Binary Search',
   'Stack', 'Queue', 'Linked List', 'Tree', 'Graph', 'DFS', 'BFS',
   'Dynamic Programming', 'Greedy', 'Backtracking', 'Heap', 'Trie',
-  'Sorting', 'Math', 'String', 'Bit Manipulation', 'Union Find', 'Monotonic Stack', 'Simulation', 'Difference Array',
+  'Sorting', 'Math', 'String', 'Bit Manipulation', 'Union Find', 'Monotonic Stack', 'Simulation', 'Difference Array', 'Matrix Manipulation',
   'KMP', 'Bellman-Ford', 'Boyer-Moore', 'Morris Traversal',
 ];
 
