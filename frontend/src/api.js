@@ -75,11 +75,11 @@ export const createBehavioral = async (data) => {
   return res.json();
 };
 
-export const updateBehavioral = async (id, answer) => {
+export const updateBehavioral = async (id, fields) => {
   const res = await fetch(`${BASE_URL}/behavioral/${id}`, {
     method: 'PUT',
     headers: await authHeaders(),
-    body: JSON.stringify({ answer }),
+    body: JSON.stringify(fields),
   });
   return res.json();
 };

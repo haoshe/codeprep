@@ -24,24 +24,55 @@ const PREDEFINED = [
   "How do you handle stress and pressure? Give a specific example.",
 ];
 
-function QuestionCard({ question, entry, isCustom, expandedQ, setExpandedQ, draft, setDraft, onSave, onDelete, saving }) {
+function QuestionCard({ question, entry, isCustom, expandedQ, setExpandedQ, draft, setDraft, onSave, onDelete, onRename, saving }) {
+  const [editingQuestion, setEditingQuestion] = useState(false);
+  const [questionDraft, setQuestionDraft] = useState(question);
   const isOpen = expandedQ === question;
   const hasAnswer = entry?.answer;
 
+  const handleRename = async () => {
+    if (!questionDraft.trim() || questionDraft.trim() === question) {
+      setEditingQuestion(false);
+      setQuestionDraft(question);
+      return;
+    }
+    await onRename(entry.id, question, questionDraft.trim());
+    setEditingQuestion(false);
+  };
+
   return (
     <div className="bg-white rounded shadow border-l-4 border-indigo-400">
-      <button
-        onClick={() => setExpandedQ(isOpen ? null : question)}
-        className="w-full text-left px-4 py-3 flex justify-between items-center hover:bg-indigo-50 rounded"
-      >
-        <span className="text-sm font-medium text-indigo-700 pr-4">{question}</span>
+      <div className="px-4 py-3 flex justify-between items-center">
+        {editingQuestion ? (
+          <div className="flex-1 flex items-center gap-2 mr-2">
+            <input
+              className="flex-1 border border-indigo-300 rounded px-2 py-1 text-sm text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              value={questionDraft}
+              onChange={e => setQuestionDraft(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleRename(); if (e.key === 'Escape') { setEditingQuestion(false); setQuestionDraft(question); } }}
+              autoFocus
+            />
+            <button onClick={handleRename} className="text-indigo-500 text-xs hover:text-indigo-700 font-medium">Save</button>
+            <button onClick={() => { setEditingQuestion(false); setQuestionDraft(question); }} className="text-gray-400 text-xs hover:text-gray-600">Cancel</button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setExpandedQ(isOpen ? null : question)}
+            className="flex-1 text-left flex justify-between items-center hover:bg-indigo-50 rounded -mx-1 px-1"
+          >
+            <span className="text-sm font-medium text-indigo-700 pr-4">{question}</span>
+          </button>
+        )}
         <div className="flex items-center gap-2 shrink-0">
-          {hasAnswer && <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full">Answered</span>}
-          <span className="text-gray-400 text-sm">{isOpen ? '▲' : '▼'}</span>
+          {hasAnswer && !editingQuestion && <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full">Answered</span>}
+          {isCustom && !editingQuestion && (
+            <button onClick={() => { setEditingQuestion(true); setQuestionDraft(question); }} className="text-gray-400 hover:text-indigo-500 text-xs">Edit</button>
+          )}
+          {!editingQuestion && <span onClick={() => setExpandedQ(isOpen ? null : question)} className="text-gray-400 text-sm cursor-pointer">{isOpen ? '▲' : '▼'}</span>}
         </div>
-      </button>
+      </div>
 
-      {isOpen && (
+      {isOpen && !editingQuestion && (
         <div className="px-4 pb-4 border-t border-gray-100 pt-3 space-y-3">
           <textarea
             rows={6}
@@ -84,10 +115,7 @@ export default function BehavioralPage() {
   const entryFor = (question) => entries.find(e => e.question === question);
 
   const handleToggle = (question) => {
-    if (expandedQ === question) {
-      setExpandedQ(null);
-      return;
-    }
+    if (expandedQ === question) { setExpandedQ(null); return; }
     setExpandedQ(question);
     const entry = entryFor(question);
     if (drafts[question] === undefined) {
@@ -101,7 +129,7 @@ export default function BehavioralPage() {
     const answer = drafts[question] || '';
     let updated;
     if (entry) {
-      updated = await updateBehavioral(entry.id, answer);
+      updated = await updateBehavioral(entry.id, { answer });
       setEntries(entries.map(e => e.id === updated.id ? updated : e));
     } else {
       updated = await createBehavioral({ question, answer, is_custom: isCustom });
@@ -116,6 +144,17 @@ export default function BehavioralPage() {
     await deleteBehavioral(entry.id);
     setEntries(entries.filter(e => e.id !== entry.id));
     setExpandedQ(null);
+  };
+
+  const handleRename = async (id, oldQuestion, newQuestion) => {
+    const updated = await updateBehavioral(id, { question: newQuestion });
+    setEntries(entries.map(e => e.id === id ? updated : e));
+    if (expandedQ === oldQuestion) setExpandedQ(newQuestion);
+    setDrafts(d => {
+      const next = { ...d };
+      if (next[oldQuestion] !== undefined) { next[newQuestion] = next[oldQuestion]; delete next[oldQuestion]; }
+      return next;
+    });
   };
 
   const handleAddCustom = async () => {
@@ -138,10 +177,7 @@ export default function BehavioralPage() {
           <h2 className="text-xl font-semibold">Behavioural Questions</h2>
           <p className="text-sm text-gray-400 mt-0.5">{entries.filter(e => e.answer).length} of {allQuestions.length} answered</p>
         </div>
-        <button
-          onClick={() => setAddingCustom(true)}
-          className="bg-indigo-500 text-white px-4 py-2 rounded text-sm hover:bg-indigo-600"
-        >+ Add Question</button>
+        <button onClick={() => setAddingCustom(true)} className="bg-indigo-500 text-white px-4 py-2 rounded text-sm hover:bg-indigo-600">+ Add Question</button>
       </div>
 
       {addingCustom && (
@@ -167,9 +203,9 @@ export default function BehavioralPage() {
           <div className="space-y-2 mb-6">
             {customEntries.map(e => (
               <QuestionCard
-                key={e.question}
+                key={e.id}
                 question={e.question}
-                entry={entryFor(e.question)}
+                entry={e}
                 isCustom
                 expandedQ={expandedQ}
                 setExpandedQ={handleToggle}
@@ -177,6 +213,7 @@ export default function BehavioralPage() {
                 setDraft={val => setDrafts(d => ({ ...d, [e.question]: val }))}
                 onSave={handleSave}
                 onDelete={handleDelete}
+                onRename={handleRename}
                 saving={saving}
               />
             ))}
@@ -198,6 +235,7 @@ export default function BehavioralPage() {
             setDraft={val => setDrafts(d => ({ ...d, [q]: val }))}
             onSave={handleSave}
             onDelete={handleDelete}
+            onRename={handleRename}
             saving={saving}
           />
         ))}
