@@ -6,7 +6,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "https://codeprep-app.onrender.com"],
+    allow_origins=["http://localhost:3000", "http://localhost:3001", "https://codeprep-app.onrender.com", "https://codeprep-lyart.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
