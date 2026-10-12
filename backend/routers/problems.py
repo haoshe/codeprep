@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from database import get_db
 from models import Problem
 from pydantic import BaseModel
-from datetime import date
+from datetime import date, timedelta
 from typing import Optional
 from routers.sr_algo import calculate_next_review, initial_interval
 from auth import get_current_user
@@ -42,7 +42,7 @@ def create_problem(problem: ProblemCreate, db: Session = Depends(get_db), user_i
     if problem.difficulty:
         interval = initial_interval(problem.difficulty)
         db_problem.last_interval = interval
-        db_problem.next_review, _ = calculate_next_review(problem.difficulty, interval)
+        db_problem.next_review = date.today() + timedelta(days=interval)
     db.add(db_problem)
     try:
         db.commit()
@@ -57,8 +57,9 @@ def update_review(problem_id: int, update: ProblemUpdate, db: Session = Depends(
     problem = db.query(Problem).filter(Problem.id == problem_id, Problem.user_id == user_id).first()
     if not problem:
         raise HTTPException(status_code=404, detail="Problem not found")
+    days_late = (date.today() - problem.next_review).days if problem.next_review else 0
     problem.difficulty = update.difficulty
-    problem.next_review, problem.last_interval = calculate_next_review(update.difficulty, problem.last_interval or 1)
+    problem.next_review, problem.last_interval = calculate_next_review(update.difficulty, problem.last_interval or 1, days_late)
     db.commit()
     db.refresh(problem)
     return problem
@@ -104,9 +105,11 @@ PRIORITY = {'Brand New': 0, 'Hard': 1}
 def get_due_problems(limit: Optional[int] = None, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
     today = date.today()
     problems = db.query(Problem).filter(Problem.user_id == user_id, Problem.next_review <= today).all()
+    # Brand New and Hard first, then the most overdue relative to their interval
     problems.sort(key=lambda p: (
         PRIORITY.get(p.difficulty, 2),
-        p.next_review or today
+        -(today - p.next_review).days / (p.last_interval or 1),
+        p.next_review
     ))
     if limit:
         problems = problems[:limit]
