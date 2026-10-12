@@ -21,7 +21,11 @@ INITIAL_INTERVALS = {
     'Mastered': 14,
 }
 
-MAX_INTERVAL = 30
+MAX_INTERVALS = {
+    'Medium': 30,
+    'Easy': 30,
+    'Mastered': 90,
+}
 
 # Share of the days a review was late that counts toward the next interval
 LATE_CREDIT = {
@@ -36,7 +40,7 @@ def calculate_next_review(difficulty: str, last_interval: int = 1, days_late: in
     else:
         multiplier = MULTIPLIERS.get(difficulty, 1.0)
         base = last_interval + max(0, days_late) * LATE_CREDIT.get(difficulty, 0)
-        new_interval = min(max(1, math.ceil(base * multiplier)), MAX_INTERVAL)
+        new_interval = min(max(1, math.ceil(base * multiplier)), MAX_INTERVALS.get(difficulty, 30))
         if new_interval > 2:
             fuzz = random.uniform(-0.1, 0.1)
             new_interval = max(1, round(new_interval * (1 + fuzz)))
