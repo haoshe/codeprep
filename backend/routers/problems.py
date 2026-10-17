@@ -60,6 +60,7 @@ def update_review(problem_id: int, update: ProblemUpdate, db: Session = Depends(
     days_late = (date.today() - problem.next_review).days if problem.next_review else 0
     problem.difficulty = update.difficulty
     problem.next_review, problem.last_interval = calculate_next_review(update.difficulty, problem.last_interval or 1, days_late)
+    problem.last_reviewed = date.today()
     db.commit()
     db.refresh(problem)
     return problem
@@ -104,6 +105,12 @@ PRIORITY = {'Brand New': 0, 'Hard': 1}
 @router.get("/problems/due")
 def get_due_problems(limit: Optional[int] = None, db: Session = Depends(get_db), user_id: str = Depends(get_current_user)):
     today = date.today()
+    if limit is not None:
+        # limit is a daily cap, so subtract problems already reviewed today on any device
+        reviewed_today = db.query(Problem).filter(Problem.user_id == user_id, Problem.last_reviewed == today).count()
+        limit = max(limit - reviewed_today, 0)
+        if limit == 0:
+            return []
     problems = db.query(Problem).filter(Problem.user_id == user_id, Problem.next_review <= today).all()
     # Brand New and Hard first, then the most overdue relative to their interval
     problems.sort(key=lambda p: (
@@ -111,6 +118,6 @@ def get_due_problems(limit: Optional[int] = None, db: Session = Depends(get_db),
         -(today - p.next_review).days / (p.last_interval or 1),
         p.next_review
     ))
-    if limit:
+    if limit is not None:
         problems = problems[:limit]
     return problems

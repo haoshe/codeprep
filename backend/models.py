@@ -19,6 +19,7 @@ class Problem(Base):
     date_solved     = Column(Date, default=date.today)
     next_review     = Column(Date, nullable=True)
     last_interval   = Column(Integer, default=1)
+    last_reviewed   = Column(Date, nullable=True)
 
 class BehavioralEntry(Base):
     __tablename__ = "behavioral_entries"

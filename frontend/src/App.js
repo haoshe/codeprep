@@ -15,6 +15,20 @@ const toLeetCodeUrl = (name) => {
   return `https://leetcode.com/problems/${slug}/`;
 };
 
+// Daily review cap is remembered in this browser; the backend counts today's reviews across devices
+const CAP_KEY = 'reviewCap';
+const todayStr = () => new Date().toLocaleDateString('en-CA');
+
+const loadCap = () => {
+  try {
+    const v = localStorage.getItem(CAP_KEY);
+    if (v === null) return 2;
+    return v === 'all' ? null : Number(v);
+  } catch {
+    return 2;
+  }
+};
+
 const DIFFICULTY_COLORS = {
   'Brand New': 'border-purple-400 text-purple-600 hover:bg-purple-50',
   Hard: 'border-red-400 text-red-600 hover:bg-red-50',
@@ -41,7 +55,7 @@ function App() {
   const [editForm, setEditForm] = useState({});
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 20;
-  const [cap, setCap] = useState(null);
+  const [cap, setCapState] = useState(loadCap);
   const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
@@ -55,6 +69,11 @@ function App() {
     getProblems().then(setProblems);
     getDueProblems(cap).then(setDueProblems);
   }, [cap, session]);
+
+  const setCap = (n) => {
+    setCapState(n);
+    try { localStorage.setItem(CAP_KEY, n ?? 'all'); } catch {}
+  };
 
   const handleAdd = (newProblem) => {
     setProblems([...problems, newProblem]);
@@ -83,6 +102,8 @@ function App() {
     setDueProblems(dueProblems.filter(p => p.id !== id));
     setProblems(problems.map(p => p.id === id ? updated : p));
   };
+
+  const reviewedToday = problems.some(p => p.last_reviewed === todayStr());
 
   if (session === undefined) return null;
   if (!session) return <AuthPage />;
@@ -124,7 +145,7 @@ function App() {
               <h2 className="text-xl font-semibold">Today's Review Queue</h2>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-500">Cap:</span>
-                {[10, 20, null].map(n => (
+                {[2, 5, null].map(n => (
                   <button
                     key={n ?? 'all'}
                     onClick={() => setCap(n)}
@@ -134,7 +155,7 @@ function App() {
               </div>
             </div>
             {dueProblems.length === 0 ? (
-              <p className="text-gray-500">No problems due today.</p>
+              <p className="text-gray-500">{reviewedToday ? 'Done for today ✓' : 'No problems due today.'}</p>
             ) : (
               <ul className="space-y-2">
                 {dueProblems.map(p => (
